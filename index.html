@@ -319,6 +319,25 @@ const SHOPS = [
   {name:'에누리',     emoji:'⚪', url:q=>`https://www.enuri.com/search.jsp?keyword=${encodeURIComponent(q)}`},
 ];
 
+const BRANDS = [
+  { keywords:['samsung','삼성','galaxy','갤럭시','qled','qn','neo qled'], name:'삼성전자 공식몰', emoji:'🔷', url:q=>`https://www.samsung.com/sec/search/?searchvalue=${encodeURIComponent(q)}` },
+  { keywords:['lg','엘지','oled','gram','dios','thinq'], name:'LG전자 공식몰', emoji:'🟣', url:q=>`https://www.lge.co.kr/search?query=${encodeURIComponent(q)}` },
+  { keywords:['apple','애플','iphone','ipad','macbook','airpods','imac','airtag'], name:'Apple 공식몰', emoji:'🍎', url:q=>`https://www.apple.com/kr/search/${encodeURIComponent(q)}?src=globalnav` },
+  { keywords:['sony','소니','wh-','wf-','xperia','bravia','playstation','ps5'], name:'Sony 공식몰', emoji:'🎮', url:q=>`https://www.sony.co.kr/search/searchResult?q=${encodeURIComponent(q)}` },
+  { keywords:['bosch','보쉬','gsb','gbh','gsr','gst','gcm'], name:'Bosch 공식몰', emoji:'🔧', url:q=>`https://www.bosch-diy.com/kr/ko/search/#query=${encodeURIComponent(q)}` },
+  { keywords:['hp','hewlett','laserjet','inkjet','envy','officejet','deskjet'], name:'HP 공식몰', emoji:'🖨️', url:q=>`https://www.hp.com/kr-ko/shop/SearchDisplay?searchTerm=${encodeURIComponent(q)}` },
+  { keywords:['canon','캐논','pixma','imageclass','eos'], name:'Canon 공식몰', emoji:'📷', url:q=>`https://www.canon-bs.co.kr/search?keyword=${encodeURIComponent(q)}` },
+  { keywords:['epson','엡손'], name:'Epson 공식몰', emoji:'🖨️', url:q=>`https://www.epson.co.kr/search?keyword=${encodeURIComponent(q)}` },
+  { keywords:['microsoft','마이크로소프트','surface','xbox'], name:'Microsoft 공식몰', emoji:'🪟', url:q=>`https://www.microsoft.com/ko-kr/search/explore?q=${encodeURIComponent(q)}` },
+  { keywords:['lenovo','레노버','thinkpad','thinkbook','ideapad'], name:'Lenovo 공식몰', emoji:'💻', url:q=>`https://www.lenovo.com/kr/ko/searchResultPage/?q=${encodeURIComponent(q)}` },
+  { keywords:['dyson','다이슨'], name:'Dyson 공식몰', emoji:'🌀', url:q=>`https://www.dyson.co.kr/search#q=${encodeURIComponent(q)}` },
+];
+
+function detectBrand(q) {
+  const lq = q.toLowerCase();
+  return BRANDS.find(b => b.keywords.some(k => lq.includes(k))) || null;
+}
+
 let items = [{code:'', spec:'', qty:1, price:0}];
 let lowestShop = '', lowestPrice = 0;
 let qno = parseInt(localStorage.getItem('voda_qno')||'1');
@@ -358,7 +377,20 @@ function doStep1() {
 
   // 쇼핑몰 링크 생성
   document.getElementById('model-badge').textContent = '🔍 ' + q;
-  document.getElementById('shop-grid').innerHTML = SHOPS.map(s => `
+
+  // 브랜드 공식몰 감지
+  const brand = detectBrand(q);
+  const brandCard = brand ? `
+    <a class="shop-card" href="${brand.url(q)}" target="_blank"
+      style="border-color:#805AD5;background:#FAF5FF;grid-column:1/-1;">
+      <span class="shop-emoji">${brand.emoji}</span>
+      <div class="shop-info">
+        <div class="shop-name" style="color:#553C9A;font-weight:700;">${brand.name} ★</div>
+        <div class="shop-action" style="color:#805AD5;">공식 가격 확인 →</div>
+      </div>
+    </a>` : '';
+
+  document.getElementById('shop-grid').innerHTML = brandCard + SHOPS.map(s => `
     <a class="shop-card" href="${s.url(q)}" target="_blank">
       <span class="shop-emoji">${s.emoji}</span>
       <div class="shop-info">
